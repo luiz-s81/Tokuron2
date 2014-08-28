@@ -1,16 +1,3 @@
-
-//Please change the following to your openCV version
-// Library
-#ifdef _DEBUG
-//#pragma comment (lib, "opencv_core245d.lib")
-//#pragma comment (lib, "opencv_highgui245d.lib")
-//#pragma comment (lib, "opencv_imgproc245d.lib")
-#else
-//#pragma comment (lib, "opencv_core245.lib")
-//#pragma comment (lib, "opencv_highgui245.lib")
-//#pragma comment (lib, "opencv_imgproc245.lib")
-#endif
-
 // Includes
 #include <stdlib.h>
 #include <stdio.h>
@@ -70,27 +57,22 @@ void onMouse( int event, int x, int y, int flag, void* )
 	default:
 		break;
 	}
-
 }
-
-
 
 int main(int argc, char** argv) 
 {
-
 	char filename[64];
 	int key;
 
 	printf("Input image: ");
+	scanf("%s",filename);
 
-	//scanf("%s",filename);
-
-	cv::Mat original_image = cv::imread("image/hito.bmp");
+	/*cv::Mat original_image = cv::imread("image/densen.bmp");
 	imWidth = original_image.cols;
 	imHeight = original_image.rows;
-	original_image.copyTo(image);
+	original_image.copyTo(image);*/
 
-	/*cv::Mat original_image = cv::imread(filename,1);
+	cv::Mat original_image = cv::imread(filename,1);
 	if(original_image.empty()){
 		return -1; 
 	}else{
@@ -98,7 +80,7 @@ int main(int argc, char** argv)
 		imWidth = original_image.cols;
 		imHeight = original_image.rows;
 		original_image.copyTo(image);
-	}*/
+	}
 
 	cv::namedWindow("image inpainting", CV_WINDOW_AUTOSIZE|CV_WINDOW_FREERATIO);
 	cv::setMouseCallback("image inpainting", onMouse, 0);
@@ -167,8 +149,6 @@ int main(int argc, char** argv)
 		}
 
 		cv::imshow("image inpainting",image);
-
-
 	}
 
 	return 0;
