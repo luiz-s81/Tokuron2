@@ -13,6 +13,7 @@ void inpainting(cv::Mat image){
 
 	int width = image.cols; // image width
 	int height = image.rows; // image height
+
 	//Used for window size for calculating pattern similarity. Length of window's side is 2*wsize+1
 	int win_size = 20; 
 	int win_lenght = 2 * win_size + 1;
