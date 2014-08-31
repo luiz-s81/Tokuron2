@@ -67,7 +67,7 @@ int main(int argc, char** argv)
 	printf("Input image: ");
 	scanf("%s",filename);
 
-	/*cv::Mat original_image = cv::imread("image/densen.bmp");
+	/*cv::Mat original_image = cv::imread("image/hito.bmp");
 	imWidth = original_image.cols;
 	imHeight = original_image.rows;
 	original_image.copyTo(image);*/

@@ -1,4 +1,50 @@
 #include <opencv2/opencv.hpp>
+#include <iostream>
+#include <fstream>
+
+// Used to print the mask to file
+void writeMatToFile(cv::Mat& m, const char* filename)
+{
+	std::ofstream fout(filename);
+	int width = m.cols;// width of image 
+	int height = m.rows;// height of image
+
+	if(!fout)
+	{
+		std::cout<<"File Not Opened"<<std::endl;  return;
+	}
+	
+	for(int y=0; y<height; y++){
+		for(int x=0; x<width; x++){
+			if(m.data[y*width+x] == 255)
+				fout << 2;
+			else if(m.data[y*width+x] == 1)
+				fout << 1;
+			else if(m.data[y*width+x] == 0)
+				fout << 0;
+			else if(m.data[y*width+x] == 5)
+				fout << 5;
+			else if(m.data[y*width+x] == 10)
+				fout << 9;
+			if (x==width-1)
+			{
+				fout<<std::endl;
+			}
+		}	
+	}
+	
+	//for(int i=0; i<m.rows; i++)
+	//{
+	//	for(int j=0; j<m.cols; j++)
+	//	{
+	//		fout<<m.at<float>(i,j)<<"\t";
+	//	}
+	//	fout<<std::endl;
+	//}
+
+	fout.close();
+	std::cout << "EOF" << std::endl;
+}
 
 // image -> input image
 // mask -> mask iamge
@@ -8,6 +54,9 @@ void generate_mask(cv::Mat image, cv::Mat mask, int win_size)
 	int width = image.cols;// width of image 
 	int height = image.rows;// height of image
 
+	// Reseting the mask. Otherwise it will not be "refresh"
+	// on each interation
+	mask = cv::Mat::ones(height, width, CV_8UC1);
 	// Mat initialization
 	cv::Mat tmp_image = cv::Mat::zeros(height, width, CV_8UC3);
 
@@ -152,7 +201,14 @@ void generate_mask(cv::Mat image, cv::Mat mask, int win_size)
 		}
 	}
 
+	// used to debug the mask "making"
+	//writeMatToFile(mask, "luiz.txt");
+
+	//cv::imshow("image inpainting",image);
 	cv::imshow("temp image",tmp_image);
 	cv::imshow("mask",mask);
 	cv::waitKey(1);
 }
+
+
+

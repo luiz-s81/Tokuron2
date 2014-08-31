@@ -8,14 +8,14 @@ extern bool inpainting_flag;
 
 void generate_mask(cv::Mat, cv::Mat, int);
 int calculate_ssd(int, int, int, cv::Mat, int *mask, int tar_x, int tar_y, int cor_x, int cor_y);
-void paint(cv::Mat image, cv::Mat mask, int targetX, int targetY, int correspondingX, int correspondingY, int win_size);
 
 void inpainting(cv::Mat image){
 
 	int width = image.cols; // image width
 	int height = image.rows; // image height
 	//Used for window size for calculating pattern similarity. Length of window's side is 2*wsize+1
-	int win_size= 8; 
+	int win_size = 20; 
+	int win_lenght = 2 * win_size + 1;
 	//int size = 2 * win_size +1;
 
 	// Mask image for classifying image into missing regions and so on
@@ -65,6 +65,8 @@ void inpainting(cv::Mat image){
 	int correspondingX = 0;
 	int correspondingY = 0;
 
+	found = false;
+
 	//Task 1-7
 	for(int y=0; y<height; y++)
 	{
@@ -73,8 +75,10 @@ void inpainting(cv::Mat image){
 			unsigned char target_mask = mask.data[y*width + x];
 
 			// Find pixel with 0
-			if(target_mask == 0)
+			if(target_mask == 0 && !found)
 			{
+				//found = true;
+				
 				for(int j=0; j<height; j++)
 				{
 					for(int i=0; i<width; i++)
@@ -85,7 +89,7 @@ void inpainting(cv::Mat image){
 						if(corresponding_mask == 1)
 						{
 							// Is the pointer for the mask useless?
-							int ssd = calculate_ssd(width, height, win_size, image, 0, x, y, i, j);
+							int ssd = calculate_ssd(width, height, win_lenght, image, 0, x, y, i, j);
 
 							if(ssd < smallest_ssd  && ssd > 0)
 							{
@@ -110,17 +114,19 @@ void inpainting(cv::Mat image){
 						}
 					}
 			    }
-
-				cv::waitKey(1);
+				
 				cv::imshow("image inpainting",image);
+				cv::waitKey(1);
 				smallest_ssd =  std::numeric_limits<int>::max();
+				
+				generate_mask(image, mask, win_size);
 
 			} // if(maskValue == 0)
 		}
 	}
 
-	cv::imshow("image inpainting",image);
-	cv::waitKey(1);
+	/*cv::imshow("image inpainting",image);
+	cv::waitKey(1);*/
 
 	printf("Fin.\n");
 	inpainting_flag=false;
