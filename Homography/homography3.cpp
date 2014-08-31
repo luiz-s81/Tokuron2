@@ -8,7 +8,7 @@
 #include "opencv2/calib3d/calib3d.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 
-cv::Mat do_panorama(cv::Mat image1, cv::Mat image2)
+cv::Mat do_panorama2(cv::Mat image1, cv::Mat image2)
 {
 	// Load the images
 	/*cv::Mat image1= cv::imread("image/naist_center.jpg",1);
@@ -34,20 +34,22 @@ cv::Mat do_panorama(cv::Mat image1, cv::Mat image2)
 
 	std::vector<cv::KeyPoint> keypoints_object, keypoints_scene;
 
-	detector.detect(gray_image1, keypoints_object);
-	detector.detect(gray_image2, keypoints_scene);
+	detector.detect(gray_image2, keypoints_object);
+	detector.detect(gray_image1, keypoints_scene);
 
 	//-- Step 2: Calculate descriptors (feature vectors)
 	cv::SurfDescriptorExtractor extractor;
 
 	cv::Mat descriptors_object, descriptors_scene;
 
-	extractor.compute(gray_image1, keypoints_object, descriptors_object);
-	extractor.compute(gray_image2, keypoints_scene, descriptors_scene);
+	extractor.compute(gray_image2, keypoints_object, descriptors_object);
+	extractor.compute(gray_image1, keypoints_scene, descriptors_scene);
 
 	//-- Step 3: Matching descriptor vectors using FLANN matcher
 	cv::FlannBasedMatcher matcher;
 	std::vector<cv::DMatch> matches;
+
+	//should I change the order here??
 	matcher.match(descriptors_object, descriptors_scene, matches);
 	//matcher.match(descriptors_scene, descriptors_object, matches);
 
@@ -105,20 +107,12 @@ cv::Mat do_panorama(cv::Mat image1, cv::Mat image2)
 	cv::Mat H = findHomography(obj, scene, CV_RANSAC);
 	// Use the Homography Matrix to warp the images
 	cv::Mat result;
-
-	warpPerspective(image1, result, H, cv::Size(image1.cols+image2.cols, image1.rows *2));
 	
-	/*imshow( "Warp Perspective", result );
-	cv::waitKey(0);*/
+	warpPerspective(image2, result, H, cv::Size(image1.cols+(image2.cols), image1.rows+(image2.rows)));
 	
-
-	cv::Mat ROI(result, cv::Rect(0,0,image2.cols,image2.rows));
-
-	imshow( "Result1", result );
-
-	image2.copyTo(ROI);
-	
-	imshow( "Result2", result );
+	imshow( "Warp Perspective", result );
+	cv::Mat ROI(result, cv::Rect(0,0,image1.cols,image1.rows));
+	image1.copyTo(ROI);
 
 	return result;
 

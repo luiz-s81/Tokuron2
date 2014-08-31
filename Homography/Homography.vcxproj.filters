@@ -24,6 +24,9 @@
     <ClCompile Include="homography2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="homography3.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="matcher.h">
