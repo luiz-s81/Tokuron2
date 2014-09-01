@@ -1,153 +1,146 @@
-/*------------------------------------------------------------------------------------------*\
-This file contains material supporting chapter 9 of the cookbook:  
-Computer Vision Programming using the OpenCV Library. 
-by Robert Laganiere, Packt Publishing, 2011.
-
-This program is free software; permission is hereby granted to use, copy, modify, 
-and distribute this source code, or portions thereof, for any purpose, without fee, 
-subject to the restriction that the copyright notice may not be removed 
-or altered from any source or altered source distribution. 
-The software is released on an as-is basis and without any warranties of any kind. 
-In particular, the software is not guaranteed to be fault-tolerant or free from failure. 
-The author disclaims all warranties with regard to this software, any use, 
-and any consequent failure, is purely the responsibility of the user.
-
-Copyright (C) 2010-2011 Robert Laganiere, www.laganiere.name
-\*------------------------------------------------------------------------------------------*/
-
+#include <stdio.h>
 #include <iostream>
-#include <vector>
-#include <opencv2/core/core.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/features2d/features2d.hpp>
-#include <opencv2/nonfree/features2d.hpp>
-#include <opencv2/calib3d/calib3d.hpp>
-#include "matcher.h"
 
-int main1()
+#include "opencv2/core/core.hpp"
+#include "opencv2/features2d/features2d.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/nonfree/nonfree.hpp"
+#include "opencv2/calib3d/calib3d.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
+
+cv::Mat do_panorama2(cv::Mat image1, cv::Mat image2, cv::Mat mask)
 {
-	// Read input images
-	cv::Mat image1= cv::imread("image/naist_center.jpg",1);
-	cv::Mat image2= cv::imread("image/naist_left.jpg",1);
-	cv::Mat image3= cv::imread("image/naist_right.jpg",1);
-	/*cv::Mat image1= cv::imread("image/parliament1.bmp",0);
-	cv::Mat image2= cv::imread("image/parliament2.bmp",0);*/
+	// Load the images
+	/*cv::Mat image1= cv::imread("image/naist_center.jpg",1);
+	cv::Mat image2= cv::imread("image/naist_left.jpg",1);*/
 
-	if (!image1.data || !image2.data || !image3.data)
-		return 0; 
+	cv::Mat gray_image1;
+	cv::Mat gray_image2;
 
-	// Display the images
-	/*cv::namedWindow("Image 1");
-	cv::imshow("Image 1",image1);
-	cv::namedWindow("Image 2");
-	cv::imshow("Image 2",image2);*/
+	// Convert to Grayscale
+	cvtColor(image1, gray_image1, CV_RGB2GRAY);
+	cvtColor(image2, gray_image2, CV_RGB2GRAY);
 
-	// Prepare the matcher
-	RobustMatcher rmatcher;
-	rmatcher.setConfidenceLevel(0.98);
-	rmatcher.setMinDistanceToEpipolar(1.0);
-	rmatcher.setRatio(0.65f);
-	cv::Ptr<cv::FeatureDetector> pfd= new cv::SurfFeatureDetector(10); 
-	rmatcher.setFeatureDetector(pfd);
+	/*imshow("first image",image2);
+	imshow("second image",image1);*/
 
-	// Match the two images
+	/*if( !gray_image1.data || !gray_image2.data )
+	{ std::cout<< " --(!) Error reading images " << std::endl; return -1; }*/
+
+	//-- Step 1: Detect the keypoints using SURF Detector
+	int minHessian = 400;
+
+	cv::SurfFeatureDetector detector(minHessian);
+
+	std::vector<cv::KeyPoint> keypoints_object, keypoints_scene;
+
+	detector.detect(gray_image2, keypoints_object);
+	detector.detect(gray_image1, keypoints_scene);
+
+	//-- Step 2: Calculate descriptors (feature vectors)
+	cv::SurfDescriptorExtractor extractor;
+
+	cv::Mat descriptors_object, descriptors_scene;
+
+	extractor.compute(gray_image2, keypoints_object, descriptors_object);
+	extractor.compute(gray_image1, keypoints_scene, descriptors_scene);
+
+	//-- Step 3: Matching descriptor vectors using FLANN matcher
+	cv::FlannBasedMatcher matcher;
 	std::vector<cv::DMatch> matches;
-	std::vector<cv::KeyPoint> keypoints1, keypoints2, keypoints3, keypoints4;
-	cv::Mat fundemental= rmatcher.match(image1,image2,matches, keypoints1, keypoints2);
 
+	//should I change the order here??
+	matcher.match(descriptors_object, descriptors_scene, matches);
+	//matcher.match(descriptors_scene, descriptors_object, matches);
 
-	// draw the matches
-	cv::Mat imageMatches;
-	cv::drawMatches(image1,keypoints1,  // 1st image and its keypoints
-		image2,keypoints2,  // 2nd image and its keypoints
-		matches,			// the matches
-		imageMatches,		// the image produced
-		cv::Scalar(255,255,255)); // color of the lines
-	cv::namedWindow("Matches");
-	cv::imshow("Matches",imageMatches);
+	double max_dist = 0; double min_dist = 100;
 
-	// Convert keypoints into Point2f
-	std::vector<cv::Point2f> points1, points2, points3, points4;
-	for (std::vector<cv::DMatch>::const_iterator it= matches.begin();
-		it!= matches.end(); ++it) {
+	//-- Quick calculation of max and min distances between keypoints
+	for(int i = 0; i < descriptors_object.rows; i++)
+	{
+		double dist = matches[i].distance;
 
-			// Get the position of left keypoints
-			float x= keypoints1[it->queryIdx].pt.x;
-			float y= keypoints1[it->queryIdx].pt.y;
-			points1.push_back(cv::Point2f(x,y));
-			// Get the position of right keypoints
-			x= keypoints2[it->trainIdx].pt.x;
-			y= keypoints2[it->trainIdx].pt.y;
-			points2.push_back(cv::Point2f(x,y));
+		if(dist < min_dist) 
+		{
+			min_dist = dist;
+		}
+
+		if(dist > max_dist) 
+		{
+			max_dist = dist;
+		}
 	}
 
-	std::cout << points1.size() << " " << points2.size() << " " << points3.size() << std::endl; 
+	printf("-- Max dist : %f \n", max_dist );
+	printf("-- Min dist : %f \n", min_dist );
 
-	// Find the homography between image 1 and image 2
-	std::vector<uchar> inliers(points1.size(),0);
-	cv::Mat homography= cv::findHomography(
-		cv::Mat(points1),cv::Mat(points2), // corresponding points
-		inliers,	// outputed inliers matches 
-		CV_RANSAC,	// RANSAC method
-		1.);	    // max distance to reprojection point
+	//-- Use only "good" matches (i.e. whose distance is less than 3*min_dist )
+	std::vector<cv::DMatch> good_matches;
 
-	// Draw the inlier points
-	std::vector<cv::Point2f>::const_iterator itPts= points1.begin();
-	std::vector<uchar>::const_iterator itIn= inliers.begin();
-	while (itPts!=points1.end()) {
-
-		// draw a circle at each inlier location
-		if (*itIn) 
-			cv::circle(image1,*itPts,3,cv::Scalar(255,255,255),2);
-
-		++itPts;
-		++itIn;
+	for(int i = 0; i < descriptors_object.rows; i++)
+	{ 
+		if(matches[i].distance < 2*min_dist)
+		{ 
+			good_matches.push_back(matches[i]); 
+		}
 	}
 
-	itPts= points2.begin();
-	itIn= inliers.begin();
-	while (itPts!=points2.end()) {
+	//-- Draw only "good" matches
+	/*cv::Mat img_matches;
+	drawMatches(image1, keypoints_object, image2, keypoints_scene,
+	good_matches, img_matches, cv::Scalar::all(-1), cv::Scalar::all(-1),
+	cv::vector<char>(), cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );*/
 
-		// draw a circle at each inlier location
-		if (*itIn) 
-			cv::circle(image2,*itPts,3,cv::Scalar(255,255,255),2);
+	//imshow( "Good Matches", img_matches );
 
-		++itPts;
-		++itIn;
+	std::vector<cv::Point2f> obj;
+	std::vector<cv::Point2f> scene;
+
+	for( int i = 0; i < good_matches.size(); i++ )
+	{
+		//-- Get the keypoints from the good matches
+		obj.push_back(keypoints_object[good_matches[i].queryIdx].pt);
+		scene.push_back(keypoints_scene[good_matches[i].trainIdx].pt);
 	}
 
-	// Display the images with points
-	//cv::namedWindow("Image 1 Homography Points");
-	//cv::imshow("Image 1 Homography Points",image1);
-	//cv::namedWindow("Image 2 Homography Points");
-	//cv::imshow("Image 2 Homography Points",image2);
-
-	// Warp image 1 to image 2
+	// Find the Homography Matrix
+	cv::Mat H = findHomography(obj, scene, CV_RANSAC);
+	// Use the Homography Matrix to warp the images
 	cv::Mat result;
-	cv::warpPerspective(image1, // input image
-		result,			// output image
-		homography,		// homography
-		cv::Size(image1.cols+image2.cols,image1.rows)); // size of output image
 
-	// Display the warp image
-	cv::namedWindow("result");
-	cv::imshow("result",result);
-	
-	// Copy image 1 on the first half of full image
-	cv::Mat half(result,cv::Rect(0,0,image2.cols,image2.rows));
-	cv::namedWindow("half1");
-	cv::imshow("half1",half);
+	warpPerspective(image2, result, H, cv::Size(image1.cols+(image2.cols), image1.rows+(image2.rows)));
 
-	image2.copyTo(half);
+	//imshow( "Warp Perspective", result );
 
-	cv::namedWindow("half2");
-	cv::imshow("half2",half);
+	if(mask.rows == 0)
+	{
+		cv::Mat ROI(result, cv::Rect(0,0,image1.cols,image1.rows));
+		image1.copyTo(ROI);
+	}
+	else
+	{
+		int width = mask.cols; // image width
+		int height = mask.rows; // image height
 
-	cv::namedWindow("After warping");
-	cv::imshow("After warping",result);
+		for (int y = 0; y < height; y++)
+		{
+			for (int x = 0; x < width; x++)
+			{
+				unsigned char mask_value = mask.data[y*width + x];
 
-		
-	cv::waitKey();
-	return 0;
+				if(mask_value == 255)
+				{
+					result.at<cv::Vec3b>(y, x)[0] = image1.at<cv::Vec3b>(y, x)[0];
+					result.at<cv::Vec3b>(y, x)[1] = image1.at<cv::Vec3b>(y, x)[1];
+					result.at<cv::Vec3b>(y, x)[2] = image1.at<cv::Vec3b>(y, x)[2];
+				}
+			}
+		}
+	}
+
+	return result;
+
+	//cv::waitKey(0);
+	//return 0;
 }
+

@@ -80,8 +80,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="homography.cpp" />
-    <ClCompile Include="homography2.cpp" />
-    <ClCompile Include="homography3.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
