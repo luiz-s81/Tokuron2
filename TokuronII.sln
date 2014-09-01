@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Inpainting", "Inpainting\In
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Homography", "Homography\Homography.vcxproj", "{090D9A94-7603-4DDE-861C-3680B238E81E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "InpantingTransformation", "InpaintingTransformation\InpantingTransformation.vcxproj", "{53832F17-90E0-445C-8301-5035A936749E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -31,6 +33,10 @@ Global
 		{090D9A94-7603-4DDE-861C-3680B238E81E}.Debug|Win32.Build.0 = Debug|Win32
 		{090D9A94-7603-4DDE-861C-3680B238E81E}.Release|Win32.ActiveCfg = Release|Win32
 		{090D9A94-7603-4DDE-861C-3680B238E81E}.Release|Win32.Build.0 = Release|Win32
+		{53832F17-90E0-445C-8301-5035A936749E}.Debug|Win32.ActiveCfg = Debug|Win32
+		{53832F17-90E0-445C-8301-5035A936749E}.Debug|Win32.Build.0 = Debug|Win32
+		{53832F17-90E0-445C-8301-5035A936749E}.Release|Win32.ActiveCfg = Release|Win32
+		{53832F17-90E0-445C-8301-5035A936749E}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
