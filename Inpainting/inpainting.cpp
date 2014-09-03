@@ -15,7 +15,7 @@ void inpainting(cv::Mat image){
 	int height = image.rows; // image height
 
 	//Used for window size for calculating pattern similarity. Length of window's side is 2*wsize+1
-	int win_size = 20; 
+	int win_size = 24; 
 	int win_lenght = 2 * win_size + 1;
 	//int size = 2 * win_size +1;
 
@@ -31,41 +31,43 @@ void inpainting(cv::Mat image){
 
 	// Task 1-5
 	// This is not really necessary. Just a trial for the real inpating
-	for(int y=0; y<height; y++)
-	{
-		for(int x=0; x<width; x++)
-		{
-			unsigned char mask_value = mask.data[y*width + x];
+	//for(int y=0; y<height; y++)
+	//{
+	//	for(int x=0; x<width; x++)
+	//	{
+	//		unsigned char mask_value = mask.data[y*width + x];
 
-			// Found a pixel on the border of missing area	
-			if(mask_value == 0 && !found)
-			{
-				// Looking in the window area
-				for (int i=-win_size; i<win_size; i++) 
-				{
-					for (int j=-win_size; j<win_size; j++) 
-					{
-						int mask_value = mask.data[(y+i)*width + (x+j)];
+	//		// Found a pixel on the border of missing area	
+	//		if(mask_value == 0 && !found)
+	//		{
+	//			// Looking in the window area
+	//			for (int i=-win_size; i<win_size; i++) 
+	//			{
+	//				for (int j=-win_size; j<win_size; j++) 
+	//				{
+	//					int mask_value = mask.data[(y+i)*width + (x+j)];
 
-						// If we found a missing area, paint it
-						if(mask_value == 255)
-						{
-							image.data[(y+i)*width*3+(x+j)*3+0] = 0; //blue
-							image.data[(y+i)*width*3+(x+j)*3+1] = 255; //green
-							image.data[(y+i)*width*3+(x+j)*3+2] = 0; //red
-						}
-					}
-				}
+	//					// If we found a missing area, paint it
+	//					if(mask_value == 255)
+	//					{
+	//						image.data[(y+i)*width*3+(x+j)*3+0] = 0; //blue
+	//						image.data[(y+i)*width*3+(x+j)*3+1] = 255; //green
+	//						image.data[(y+i)*width*3+(x+j)*3+2] = 0; //red
+	//					}
+	//				}
+	//			}
 
-				found = true;
-			}
-		}
-	}
+	//			found = true;
+	//		}
+	//	}
+	//}
 
 	int smallest_ssd =  std::numeric_limits<int>::max();
 	int correspondingX = 0;
 	int correspondingY = 0;
-
+	int position = 0;
+	int total_positions = width * height;
+	
 	found = false;
 
 	//Task 1-7
@@ -79,7 +81,7 @@ void inpainting(cv::Mat image){
 			if(target_mask == 0 && !found)
 			{
 				//found = true;
-				
+
 				for(int j=0; j<height; j++)
 				{
 					for(int i=0; i<width; i++)
@@ -107,19 +109,24 @@ void inpainting(cv::Mat image){
 				{
 					for (int t = -win_size; t <= win_size; t++)
 					{
-						if (mask.data[(y+w)*width+(x+t)] == 255)
+						position = (y+w)*width + (x+t);
+
+						if(position >= 0 && position < total_positions)
 						{
-							image.data[(y+w)*width*3+(x+t)*3+0] = image.data[(correspondingY+w)*width*3+(correspondingX+t)*3+0];
-							image.data[(y+w)*width*3+(x+t)*3+1] = image.data[(correspondingY+w)*width*3+(correspondingX+t)*3+1];
-							image.data[(y+w)*width*3+(x+t)*3+2] = image.data[(correspondingY+w)*width*3+(correspondingX+t)*3+2];
+							if (mask.data[(y+w)*width+(x+t)] == 255)
+							{
+								image.data[(y+w)*width*3+(x+t)*3+0] = image.data[(correspondingY+w)*width*3+(correspondingX+t)*3+0];
+								image.data[(y+w)*width*3+(x+t)*3+1] = image.data[(correspondingY+w)*width*3+(correspondingX+t)*3+1];
+								image.data[(y+w)*width*3+(x+t)*3+2] = image.data[(correspondingY+w)*width*3+(correspondingX+t)*3+2];
+							}
 						}
 					}
-			    }
-				
+				}
+
 				cv::imshow("image inpainting",image);
 				cv::waitKey(1);
 				smallest_ssd =  std::numeric_limits<int>::max();
-				
+
 				generate_mask(image, mask, win_size);
 
 			} // if(maskValue == 0)

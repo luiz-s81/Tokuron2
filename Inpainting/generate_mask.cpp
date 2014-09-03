@@ -13,7 +13,7 @@ void writeMatToFile(cv::Mat& m, const char* filename)
 	{
 		std::cout<<"File Not Opened"<<std::endl;  return;
 	}
-	
+
 	for(int y=0; y<height; y++){
 		for(int x=0; x<width; x++){
 			if(m.data[y*width+x] == 255)
@@ -32,7 +32,7 @@ void writeMatToFile(cv::Mat& m, const char* filename)
 			}
 		}	
 	}
-	
+
 	//for(int i=0; i<m.rows; i++)
 	//{
 	//	for(int j=0; j<m.cols; j++)
@@ -120,6 +120,9 @@ void generate_mask(cv::Mat image, cv::Mat mask, int win_size)
 	// Instead of look at the image and try to find missing areas
 	// It's better to look at the mask and try to find "1s" near
 	// the missing areas
+	int position  = 0;
+	int total_positions = width * height;
+
 	for(int y=0; y<height; y++){
 		for(int x=0; x<width; x++){
 
@@ -131,11 +134,15 @@ void generate_mask(cv::Mat image, cv::Mat mask, int win_size)
 				{
 					for(int j=-win_size; j<win_size; j++)
 					{
-						if (mask.data[(y+i)*width + (x+j)] == 1)
-						{
-							mask.data[(y+i)*width + (x+j)] = 5;
-						}
+						position = (y+i)*width + (x+j);
 
+						if(position >= 0 && position < total_positions)
+						{
+							if (mask.data[(y+i)*width + (x+j)] == 1)
+							{
+								mask.data[(y+i)*width + (x+j)] = 5;
+							}
+						}
 					}
 				}
 			}
