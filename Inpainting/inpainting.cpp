@@ -7,7 +7,7 @@
 extern bool inpainting_flag;
 
 void generate_mask(cv::Mat, cv::Mat, int);
-int calculate_ssd(int, int, int, cv::Mat, int *mask, int tar_x, int tar_y, int cor_x, int cor_y);
+int calculate_ssd(int, int, int, cv::Mat, cv::Mat, int tar_x, int tar_y, int cor_x, int cor_y);
 
 void inpainting(cv::Mat image){
 
@@ -15,7 +15,7 @@ void inpainting(cv::Mat image){
 	int height = image.rows; // image height
 
 	//Used for window size for calculating pattern similarity. Length of window's side is 2*wsize+1
-	int win_size = 24; 
+	int win_size = 6; 
 	int win_lenght = 2 * win_size + 1;
 	//int size = 2 * win_size +1;
 
@@ -92,7 +92,7 @@ void inpainting(cv::Mat image){
 						if(corresponding_mask == 1)
 						{
 							// Is the pointer for the mask useless?
-							int ssd = calculate_ssd(width, height, win_lenght, image, 0, x, y, i, j);
+							int ssd = calculate_ssd(width, height, win_lenght, image, mask, x, y, i, j);
 
 							if(ssd < smallest_ssd  && ssd > 0)
 							{

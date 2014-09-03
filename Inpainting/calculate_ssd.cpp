@@ -1,7 +1,7 @@
 
 #include <opencv2/opencv.hpp>
 
-int calculate_ssd(int width, int height, int win_size, cv::Mat image, int *mask, int tar_x, int tar_y, int cor_x, int cor_y )
+int calculate_ssd(int width, int height, int win_size, cv::Mat image, cv::Mat mask, int tar_x, int tar_y, int cor_x, int cor_y )
 {
 	// width -> width of image(‰æ‘œ‚Ì•)
 	// height -> height of image(‰æ‘œ‚Ì‚‚³)
@@ -25,9 +25,14 @@ int calculate_ssd(int width, int height, int win_size, cv::Mat image, int *mask,
 
 			if(tar_position >= 0 && tar_position < total_positions && cor_position >= 0 && cor_position < total_positions){
 
-				ssd+=(image.data[(tar_y+p)*width*3+(tar_x+q)*3+0]-image.data[(cor_y+p)*width*3+(cor_x+q)*3+0])*(image.data[(tar_y+p)*width*3+(tar_x+q)*3+0]-image.data[(cor_y+p)*width*3+(cor_x+q)*3+0])
-					+(image.data[(tar_y+p)*width*3+(tar_x+q)*3+1]-image.data[(cor_y+p)*width*3+(cor_x+q)*3+1])*(image.data[(tar_y+p)*width*3+(tar_x+q)*3+1]-image.data[(cor_y+p)*width*3+(cor_x+q)*3+1])
-					+(image.data[(tar_y+p)*width*3+(tar_x+q)*3+2]-image.data[(cor_y+p)*width*3+(cor_x+q)*3+2])*(image.data[(tar_y+p)*width*3+(tar_x+q)*3+2]-image.data[(cor_y+p)*width*3+(cor_x+q)*3+2]);
+				unsigned char mask_target = mask.data[(tar_y+p)*width + (tar_x+q)];
+
+				if(mask_target != 255) 
+				{
+					ssd+=(image.data[(tar_y+p)*width*3+(tar_x+q)*3+0]-image.data[(cor_y+p)*width*3+(cor_x+q)*3+0])*(image.data[(tar_y+p)*width*3+(tar_x+q)*3+0]-image.data[(cor_y+p)*width*3+(cor_x+q)*3+0])
+						+(image.data[(tar_y+p)*width*3+(tar_x+q)*3+1]-image.data[(cor_y+p)*width*3+(cor_x+q)*3+1])*(image.data[(tar_y+p)*width*3+(tar_x+q)*3+1]-image.data[(cor_y+p)*width*3+(cor_x+q)*3+1])
+						+(image.data[(tar_y+p)*width*3+(tar_x+q)*3+2]-image.data[(cor_y+p)*width*3+(cor_x+q)*3+2])*(image.data[(tar_y+p)*width*3+(tar_x+q)*3+2]-image.data[(cor_y+p)*width*3+(cor_x+q)*3+2]);
+				}
 			}
 
 		}
