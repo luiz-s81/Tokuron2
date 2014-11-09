@@ -1,0 +1,14 @@
+#include "myraster2.inc"
+
+camera{
+	angle 80
+	location <0.0, 0.8, -50>
+	right x*image_width/image_height
+	look_at <0.0, 0.0, 0.0>
+}
+
+light_source{ <0.0, 0.8, -50> color <1, 1, 1> }
+object{ sphere {<0, 0, 0>, 1}
+	pigment {color <0,1,0>}
+	finish {diffuse 1.0 ambient 0.0}
+}
