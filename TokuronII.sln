@@ -11,6 +11,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Homography", "Homography\Ho
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "InpantingTransformation", "InpaintingTransformation\InpantingTransformation.vcxproj", "{53832F17-90E0-445C-8301-5035A936749E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PovRay", "PovRay\PovRay.vcxproj", "{7360B4C4-C909-4F04-82BB-EA1A80F39AA7}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tron", "Tron\Tron.vcxproj", "{69801FEE-03FF-4C10-A850-69E82175226F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -37,6 +41,14 @@ Global
 		{53832F17-90E0-445C-8301-5035A936749E}.Debug|Win32.Build.0 = Debug|Win32
 		{53832F17-90E0-445C-8301-5035A936749E}.Release|Win32.ActiveCfg = Release|Win32
 		{53832F17-90E0-445C-8301-5035A936749E}.Release|Win32.Build.0 = Release|Win32
+		{7360B4C4-C909-4F04-82BB-EA1A80F39AA7}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7360B4C4-C909-4F04-82BB-EA1A80F39AA7}.Debug|Win32.Build.0 = Debug|Win32
+		{7360B4C4-C909-4F04-82BB-EA1A80F39AA7}.Release|Win32.ActiveCfg = Release|Win32
+		{7360B4C4-C909-4F04-82BB-EA1A80F39AA7}.Release|Win32.Build.0 = Release|Win32
+		{69801FEE-03FF-4C10-A850-69E82175226F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{69801FEE-03FF-4C10-A850-69E82175226F}.Debug|Win32.Build.0 = Debug|Win32
+		{69801FEE-03FF-4C10-A850-69E82175226F}.Release|Win32.ActiveCfg = Release|Win32
+		{69801FEE-03FF-4C10-A850-69E82175226F}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

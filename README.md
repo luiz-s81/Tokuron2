@@ -11,3 +11,5 @@ These exercises cover:
 - "ImageFilter" just an exercise that use some OpenCV functions to create some fancy effects on images
 - Algorithm to paint missing areas in pictures (inpanting), using succesive texture copy
 - Algorithm to achieve better results in inpanting, using image transformations. 
+- Simple example how make animations using sequential POV-Ray files
+- Homework for the POV-Ray assigment, inspirated by the movie TRON (1981)
